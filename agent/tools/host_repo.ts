@@ -4,8 +4,7 @@ import { lstat, open, readdir, realpath, stat } from 'node:fs/promises'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-const defaultRepoRoot = '/Users/jamesclark/GitHub'
-const repoRoot = process.env.EVE_HOST_REPO_ROOT ?? defaultRepoRoot
+const repoRootEnvVar = 'EVE_HOST_REPO_ROOT'
 let realRepoRoot: Promise<string> | undefined
 
 const inputSchema = z.discriminatedUnion('action', [
@@ -39,7 +38,7 @@ const entryTypeChecks = [
 
 export default defineTool({
   description:
-    'Read-only access to local repositories under /Users/jamesclark/GitHub. Use this for absolute local repo paths; the default sandbox tools only see /workspace.',
+    'Read-only access to local repositories under the configured host root. Use this for absolute local repo paths; the default sandbox tools only see /workspace.',
   inputSchema,
   async execute(input) {
     if (input.action === 'list') {
@@ -109,8 +108,16 @@ export default defineTool({
 })
 
 async function getRealRepoRoot() {
-  realRepoRoot ??= realpath(repoRoot)
+  realRepoRoot ??= realpath(getRepoRoot())
   return realRepoRoot
+}
+
+function getRepoRoot() {
+  const repoRoot = process.env[repoRootEnvVar]
+  if (!repoRoot) {
+    throw new Error(`${repoRootEnvVar} must be set to the host repository root`)
+  }
+  return repoRoot
 }
 
 async function resolveAllowedPath(inputPath: string) {
@@ -119,7 +126,7 @@ async function resolveAllowedPath(inputPath: string) {
   const resolvedPath = await realpath(absolutePath)
 
   if (!isInsideRoot(resolvedPath, root)) {
-    throw new Error(`Path is outside allowed repo root: ${repoRoot}`)
+    throw new Error(`Path is outside allowed repo root: ${getRepoRoot()}`)
   }
 
   return {

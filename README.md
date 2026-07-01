@@ -2,7 +2,7 @@
 
 An eve agent for coding assistance against local repositories on the host machine.
 
-The agent uses eve's filesystem-first layout, exposes the built-in eve HTTP channel, and includes a custom read-only `host_repo` tool for accessing repositories under user path.
+The agent uses eve's filesystem-first layout, exposes the built-in eve HTTP channel, and includes a custom read-only `host_repo` tool for accessing repositories under a configured host root.
 
 ## Requirements
 
@@ -56,14 +56,14 @@ eve derives names from file paths. For example, [agent/tools/host_repo.ts](agent
 
 ## Host Repository Tool
 
-The `host_repo` tool gives the agent read-only access to repositories outside the sandbox. It is intended for absolute local paths under `/Users/jamesclark/GitHub`, because the default sandbox file tools only see `/workspace`.
+The `host_repo` tool gives the agent read-only access to repositories outside the sandbox. It is intended for absolute local paths under the configured host root, because the default sandbox file tools only see `/workspace`.
 
 Supported actions:
 
 - `list`: list a directory with bounded depth and entry count
 - `read`: read a text file with line and byte limits
 
-By default, paths are resolved under `/Users/jamesclark/GitHub`. Override that root with:
+Set the host root before running the agent:
 
 ```bash
 EVE_HOST_REPO_ROOT=/path/to/repos bun run dev
