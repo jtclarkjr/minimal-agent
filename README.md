@@ -2,7 +2,7 @@
 
 An eve agent for coding assistance against local repositories on the host machine.
 
-The agent uses eve's filesystem-first layout, exposes the built-in eve HTTP channel, and includes a custom read-only `host_repo` tool for accessing repositories under `/Users/jamesclark/GitHub`.
+The agent uses eve's filesystem-first layout, exposes the built-in eve HTTP channel, and includes a custom read-only `host_repo` tool for accessing repositories under user path.
 
 ## Requirements
 
