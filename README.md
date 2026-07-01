@@ -1,4 +1,4 @@
-# overlord-agent
+# minimal-agent
 
 An eve agent for coding assistance against local repositories on the host machine.
 
