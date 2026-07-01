@@ -1,4 +1,5 @@
 import path from 'node:path'
+import type { Dirent } from 'node:fs'
 import { lstat, open, readdir, realpath, stat } from 'node:fs/promises'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
@@ -29,6 +30,12 @@ type Entry = {
   type: 'directory' | 'file' | 'symlink' | 'other'
   size?: number
 }
+
+const entryTypeChecks = [
+  ['directory', (child: Dirent) => child.isDirectory()],
+  ['file', (child: Dirent) => child.isFile()],
+  ['symlink', (child: Dirent) => child.isSymbolicLink()]
+] as const satisfies ReadonlyArray<readonly [Entry['type'], (child: Dirent) => boolean]>
 
 export default defineTool({
   description:
@@ -127,6 +134,10 @@ function isInsideRoot(targetPath: string, root: string) {
   return relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath))
 }
 
+function getEntryType(child: Dirent): Entry['type'] {
+  return entryTypeChecks.find(([, matches]) => matches(child))?.[0] ?? 'other'
+}
+
 async function walkDirectory(options: {
   absolutePath: string
   root: string
@@ -151,13 +162,7 @@ async function walkDirectory(options: {
 
     const childPath = path.join(options.absolutePath, child.name)
     const childStat = await lstat(childPath)
-    const type = child.isDirectory()
-      ? 'directory'
-      : child.isFile()
-        ? 'file'
-        : child.isSymbolicLink()
-          ? 'symlink'
-          : 'other'
+    const type = getEntryType(child)
 
     options.entries.push({
       path: path.relative(options.root, childPath),
