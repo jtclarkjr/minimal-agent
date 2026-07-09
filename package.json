@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "24.x",
-    "@typescript/native-preview": "7.0.0-dev.20260523.1",
+    "typescript": "^7.0.2",
     "microsandbox": "^0.5.6",
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0"
