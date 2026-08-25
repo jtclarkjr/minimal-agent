@@ -11,3 +11,7 @@ dist
 *.tsbuildinfo
 .env*.local
 /.vscode
+/graphify-out
+.graphify_detect.json
+.graphify_ast.json
+.graphify_uncached.txt
